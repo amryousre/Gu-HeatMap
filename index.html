@@ -365,7 +365,48 @@
 
           document.getElementById('vendor-count').textContent = `Total Vendors: ${validVendors.length}`;
 
-          // Function to normalize location names
+          // Function to get location name based on coordinates
+          function getLocationFromCoordinates(lat, lng) {
+            // Define major Saudi cities with their approximate coordinates
+            const cities = [
+              { name: 'Riyadh', lat: 24.7136, lng: 46.6753, radius: 0.5 },
+              { name: 'Jeddah', lat: 21.4858, lng: 39.1925, radius: 0.5 },
+              { name: 'Dammam', lat: 26.4207, lng: 50.0888, radius: 0.3 },
+              { name: 'Mecca', lat: 21.4225, lng: 39.8262, radius: 0.3 },
+              { name: 'Medina', lat: 24.5247, lng: 39.5692, radius: 0.3 },
+              { name: 'Al Khobar', lat: 26.2172, lng: 50.1971, radius: 0.2 },
+              { name: 'Al Jubail', lat: 27.0049, lng: 49.6609, radius: 0.3 },
+              { name: 'Qatif', lat: 26.5562, lng: 50.0089, radius: 0.2 },
+              { name: 'Al Ahsa', lat: 25.3832, lng: 49.5877, radius: 0.4 },
+              { name: 'Abha', lat: 18.2164, lng: 42.5053, radius: 0.3 },
+              { name: 'Jizan', lat: 16.8894, lng: 42.5611, radius: 0.3 },
+              { name: 'Tabuk', lat: 28.3835, lng: 36.5664, radius: 0.3 },
+              { name: 'Hail', lat: 27.5114, lng: 41.7208, radius: 0.3 },
+              { name: 'Al Jouf', lat: 29.8874, lng: 40.1008, radius: 0.3 },
+              { name: 'Najran', lat: 17.5656, lng: 44.2289, radius: 0.3 },
+              { name: 'Al Baha', lat: 20.0129, lng: 41.4677, radius: 0.3 },
+              { name: 'Northern Borders', lat: 30.0049, lng: 38.1667, radius: 0.4 }
+            ];
+            
+            // Check if coordinates fall within any city's radius
+            for (const city of cities) {
+              const distance = Math.sqrt(
+                Math.pow(lat - city.lat, 2) + Math.pow(lng - city.lng, 2)
+              );
+              if (distance <= city.radius) {
+                return city.name;
+              }
+            }
+            
+            // If not near a major city, return region based on coordinates
+            if (lat > 28) return 'Northern Region';
+            if (lat > 25) return 'Central Region';
+            if (lat > 20) return 'Western Region';
+            if (lat > 16) return 'Southern Region';
+            return 'Eastern Region';
+          }
+
+          // Function to normalize location names (fallback for address-based location)
           function normalizeLocation(location) {
             if (!location) return 'Unknown';
             
@@ -481,15 +522,20 @@
           // Initialize counters for different cities
           let cityStats = {};
 
-          // Categorize vendors by city/region
+          // Categorize vendors by city/region based on coordinates
           validVendors.forEach(vendor => {
             const address = vendor.addresses[0];
-            const normalizedCity = normalizeLocation(address.address_1);
-            cityStats[normalizedCity] = (cityStats[normalizedCity] || 0) + 1;
+            // Use coordinates to determine location, fallback to address if needed
+            const locationFromCoords = getLocationFromCoordinates(address.lat, address.lng);
+            const locationFromAddress = normalizeLocation(address.address_1);
+            
+            // Prefer coordinate-based location, but use address-based if coordinates give generic region
+            const finalLocation = locationFromCoords.includes('Region') ? locationFromAddress : locationFromCoords;
+            cityStats[finalLocation] = (cityStats[finalLocation] || 0) + 1;
           });
 
           // Build the statistics section
-          let statsHtml = '<strong>Vendors by Location:</strong><br>';
+          let statsHtml = '<strong>Vendors by Location (Based on Coordinates):</strong><br>';
           
           // Sort cities by vendor count
           const sortedCities = Object.entries(cityStats)
@@ -505,6 +551,33 @@
           </div>`;
 
           sortedCities.forEach(([city, count]) => {
+            // Get coordinate range for this location if it's a major city
+            let coordInfo = '';
+            const cities = [
+              { name: 'Riyadh', lat: 24.7136, lng: 46.6753 },
+              { name: 'Jeddah', lat: 21.4858, lng: 39.1925 },
+              { name: 'Dammam', lat: 26.4207, lng: 50.0888 },
+              { name: 'Mecca', lat: 21.4225, lng: 39.8262 },
+              { name: 'Medina', lat: 24.5247, lng: 39.5692 },
+              { name: 'Al Khobar', lat: 26.2172, lng: 50.1971 },
+              { name: 'Al Jubail', lat: 27.0049, lng: 49.6609 },
+              { name: 'Qatif', lat: 26.5562, lng: 50.0089 },
+              { name: 'Al Ahsa', lat: 25.3832, lng: 49.5877 },
+              { name: 'Abha', lat: 18.2164, lng: 42.5053 },
+              { name: 'Jizan', lat: 16.8894, lng: 42.5611 },
+              { name: 'Tabuk', lat: 28.3835, lng: 36.5664 },
+              { name: 'Hail', lat: 27.5114, lng: 41.7208 },
+              { name: 'Al Jouf', lat: 29.8874, lng: 40.1008 },
+              { name: 'Najran', lat: 17.5656, lng: 44.2289 },
+              { name: 'Al Baha', lat: 20.0129, lng: 41.4677 },
+              { name: 'Northern Borders', lat: 30.0049, lng: 38.1667 }
+            ];
+            
+            const cityInfo = cities.find(c => c.name === city);
+            if (cityInfo) {
+              coordInfo = ` (${cityInfo.lat.toFixed(4)}, ${cityInfo.lng.toFixed(4)})`;
+            }
+            
             statsHtml += `<div class="stats-row">
               <span class="city-name">${city}</span>
               <span class="city-count">${count}</span>
