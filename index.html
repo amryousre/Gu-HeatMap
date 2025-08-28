@@ -61,10 +61,25 @@
     .stats-row {
       display: flex;
       justify-content: space-between;
-      margin: 2px 0;
+      margin: 4px 0;
+      padding: 3px 0;
+      border-bottom: 1px solid #eee;
     }
     .city-name {
       font-weight: bold;
+      color: #333;
+      flex: 1;
+      margin-right: 10px;
+    }
+    .city-count {
+      font-weight: bold;
+      color: #1a73e8;
+      background: #e8f0fe;
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-size: 12px;
+      min-width: 20px;
+      text-align: center;
     }
     .vendor-info {
       background: #f8f9fa;
@@ -77,6 +92,151 @@
       height: 100vh;
       width: 100vw;
     }
+    .enhanced-info-window {
+      max-width: 350px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    .info-header {
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .vendor-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+    
+    .vendor-name {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    
+    .info-content {
+      padding: 16px;
+      background: white;
+    }
+    
+    .info-section {
+      margin-bottom: 16px;
+    }
+    
+    .info-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      color: #1a73e8;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .section-title svg {
+      margin-right: 6px;
+    }
+    
+    .section-content {
+      font-size: 13px;
+      color: #333;
+    }
+    
+    .address-primary {
+      font-weight: 500;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    
+    .address-secondary {
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    
+    .coordinates {
+      font-size: 11px;
+      color: #888;
+      font-family: monospace;
+    }
+    
+    .contact-item, .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .contact-item:last-child, .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .contact-label, .detail-label {
+      font-weight: 500;
+      color: #555;
+      min-width: 80px;
+    }
+    
+    .contact-value, .detail-value {
+      color: #1a73e8;
+      font-weight: 500;
+      text-align: right;
+      word-break: break-word;
+    }
+    
+    .info-footer {
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .action-btn:first-child {
+      background: #1a73e8;
+      color: white;
+    }
+    
+    .action-btn:first-child:hover {
+      background: #1557b0;
+    }
+    
+    .action-btn:last-child {
+      background: #34a853;
+      color: white;
+    }
+    
+    .action-btn:last-child:hover {
+      background: #2d8a47;
+    }
+    
+    /* Legacy styles for backward compatibility */
     .info-window {
       max-width: 300px;
       padding: 10px;
@@ -205,14 +365,127 @@
 
           document.getElementById('vendor-count').textContent = `Total Vendors: ${validVendors.length}`;
 
+          // Function to normalize location names
+          function normalizeLocation(location) {
+            if (!location) return 'Unknown';
+            
+            const loc = location.toLowerCase().trim();
+            
+            // Handle URLs and special cases
+            if (loc.includes('maps.app.goo.gl') || loc.includes('http')) {
+              return 'Online/Map Link';
+            }
+            
+            // Riyadh variations
+            if (loc.includes('riyadh') || loc.includes('الرياض')) {
+              return 'Riyadh';
+            }
+            
+            // Dammam variations
+            if (loc.includes('dammam') || loc.includes('الدمام') || loc.includes('الدمآم')) {
+              return 'Dammam';
+            }
+            
+            // Qatif variations
+            if (loc.includes('qatif') || loc.includes('القطيف')) {
+              return 'Qatif';
+            }
+            
+            // Al Jubail variations
+            if (loc.includes('jubail') || loc.includes('الجبيل')) {
+              return 'Al Jubail';
+            }
+            
+            // Al Khobar variations
+            if (loc.includes('khobar') || loc.includes('الخبر')) {
+              return 'Al Khobar';
+            }
+            
+            // Al Ahsa variations
+            if (loc.includes('ahsa') || loc.includes('الأحساء')) {
+              return 'Al Ahsa';
+            }
+            
+            // Jeddah variations
+            if (loc.includes('jeddah') || loc.includes('جدة')) {
+              return 'Jeddah';
+            }
+            
+            // Mecca variations
+            if (loc.includes('mecca') || loc.includes('مكة')) {
+              return 'Mecca';
+            }
+            
+            // Medina variations
+            if (loc.includes('medina') || loc.includes('المدينة')) {
+              return 'Medina';
+            }
+            
+            // Abha variations
+            if (loc.includes('abha') || loc.includes('أبها')) {
+              return 'Abha';
+            }
+            
+            // Jizan variations
+            if (loc.includes('jizan') || loc.includes('جازان')) {
+              return 'Jizan';
+            }
+            
+            // Tabuk variations
+            if (loc.includes('tabuk') || loc.includes('تبوك')) {
+              return 'Tabuk';
+            }
+            
+            // Hail variations
+            if (loc.includes('hail') || loc.includes('حائل')) {
+              return 'Hail';
+            }
+            
+            // Al Jouf variations
+            if (loc.includes('jouf') || loc.includes('الجوف')) {
+              return 'Al Jouf';
+            }
+            
+            // Najran variations
+            if (loc.includes('najran') || loc.includes('نجران')) {
+              return 'Najran';
+            }
+            
+            // Al Baha variations
+            if (loc.includes('baha') || loc.includes('الباحة')) {
+              return 'Al Baha';
+            }
+            
+            // Northern Borders variations
+            if (loc.includes('northern') || loc.includes('الحدود الشمالية')) {
+              return 'Northern Borders';
+            }
+            
+            // If it's a short location name (less than 20 characters), use it as is
+            if (location.length < 20) {
+              return location;
+            }
+            
+            // For longer names, try to extract meaningful parts
+            if (loc.includes('حي')) {
+              const parts = location.split('حي');
+              if (parts.length > 1) {
+                return parts[1].trim().substring(0, 15) + '...';
+              }
+            }
+            
+            // Default: truncate long names
+            return location.substring(0, 20) + '...';
+          }
+
           // Initialize counters for different cities
           let cityStats = {};
 
           // Categorize vendors by city/region
           validVendors.forEach(vendor => {
             const address = vendor.addresses[0];
-            const city = address.address_1 || 'Unknown';
-            cityStats[city] = (cityStats[city] || 0) + 1;
+            const normalizedCity = normalizeLocation(address.address_1);
+            cityStats[normalizedCity] = (cityStats[normalizedCity] || 0) + 1;
           });
 
           // Build the statistics section
@@ -222,10 +495,19 @@
           const sortedCities = Object.entries(cityStats)
             .sort(([,a], [,b]) => b - a);
 
+          // Add summary
+          const totalLocations = Object.keys(cityStats).length;
+          const topLocation = sortedCities[0];
+          
+          statsHtml += `<div style="margin: 8px 0; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
+            <div><strong>Total Locations:</strong> ${totalLocations}</div>
+            <div><strong>Most Popular:</strong> ${topLocation ? topLocation[0] + ' (' + topLocation[1] + ' vendors)' : 'N/A'}</div>
+          </div>`;
+
           sortedCities.forEach(([city, count]) => {
             statsHtml += `<div class="stats-row">
-              <span class="city-name">${city}:</span>
-              <span>${count}</span>
+              <span class="city-name">${city}</span>
+              <span class="city-count">${count}</span>
             </div>`;
           });
 
@@ -314,14 +596,98 @@
           }
         });
 
+        // Format phone number for display
+        const formatPhone = (phone) => {
+          if (!phone) return 'N/A';
+          // Remove any non-digit characters and format
+          const cleaned = phone.replace(/\D/g, '');
+          if (cleaned.length === 12 && cleaned.startsWith('966')) {
+            return `+966 ${cleaned.substring(3, 6)} ${cleaned.substring(6, 9)} ${cleaned.substring(9)}`;
+          } else if (cleaned.length === 9) {
+            return `+966 ${cleaned.substring(0, 3)} ${cleaned.substring(3, 6)} ${cleaned.substring(6)}`;
+          }
+          return phone;
+        };
+
+        // Get location type
+        const getLocationType = (address) => {
+          const loc = address.address_1?.toLowerCase() || '';
+          if (loc.includes('clinic') || loc.includes('عيادة') || loc.includes('عيادات')) return 'Medical Clinic';
+          if (loc.includes('hospital') || loc.includes('مستشفى')) return 'Hospital';
+          if (loc.includes('center') || loc.includes('مركز')) return 'Medical Center';
+          if (loc.includes('lab') || loc.includes('مختبر')) return 'Laboratory';
+          if (loc.includes('pharmacy') || loc.includes('صيدلية')) return 'Pharmacy';
+          if (loc.includes('dental') || loc.includes('اسنان')) return 'Dental Clinic';
+          if (loc.includes('beauty') || loc.includes('تجميل')) return 'Beauty Clinic';
+          return 'Medical Facility';
+        };
+
         const contentHtml = `
-          <div class="info-window">
-            <h3>${vendor.name}</h3>
-            <p><strong>Address:</strong> ${address.address_1}</p>
-            ${address.address_2 ? `<p><strong>Additional:</strong> ${address.address_2}</p>` : ''}
-            <div class="contact">
-              <p><strong>Phone:</strong> ${vendor.phone || 'N/A'}</p>
-              <p><strong>Email:</strong> ${vendor.email || 'N/A'}</p>
+          <div class="enhanced-info-window">
+            <div class="info-header">
+              <div class="vendor-type">${getLocationType(address)}</div>
+              <h3 class="vendor-name">${vendor.name}</h3>
+            </div>
+            
+            <div class="info-content">
+              <div class="info-section">
+                <div class="section-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  Location
+                </div>
+                <div class="section-content">
+                  <div class="address-primary">${address.address_1 || 'Address not available'}</div>
+                  ${address.address_2 ? `<div class="address-secondary">${address.address_2}</div>` : ''}
+                  <div class="coordinates">📍 ${address.lat.toFixed(6)}, ${address.lng.toFixed(6)}</div>
+                </div>
+              </div>
+              
+              <div class="info-section">
+                <div class="section-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  </svg>
+                  Contact
+                </div>
+                <div class="section-content">
+                  <div class="contact-item">
+                    <span class="contact-label">📞 Phone:</span>
+                    <span class="contact-value">${formatPhone(vendor.phone)}</span>
+                  </div>
+                  <div class="contact-item">
+                    <span class="contact-label">✉️ Email:</span>
+                    <span class="contact-value">${vendor.email || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="info-section">
+                <div class="section-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  Details
+                </div>
+                <div class="section-content">
+                  <div class="detail-item">
+                    <span class="detail-label">ID:</span>
+                    <span class="detail-value">#${vendor.id}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Location Type:</span>
+                    <span class="detail-value">${getLocationType(address)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="info-footer">
+              <button class="action-btn" onclick="window.open('https://maps.google.com/?q=${address.lat},${address.lng}', '_blank')">
+                🗺️ Open in Maps
+              </button>
+              ${vendor.phone ? `<button class="action-btn" onclick="window.open('tel:${vendor.phone}', '_blank')">📞 Call Now</button>` : ''}
             </div>
           </div>
         `;
