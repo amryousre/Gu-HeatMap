@@ -338,7 +338,7 @@
         } catch (localError) {
           console.log('Local file loading failed, trying API...');
           try {
-            const response = await fetch('https://stage.guapa.com.sa/api/vendor/v3.1/list-vendors-data');
+            const response = await fetch('https://guapa.com.sa/api/vendor/v3.1/list-vendors-data');
             if (!response.ok) throw new Error('API request failed');
             const jsonData = await response.json();
             data = jsonData.data || jsonData || [];
